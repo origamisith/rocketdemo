@@ -4,7 +4,7 @@ class Rocket {
     this.spriteSheet = ASSET_MANAGER.getAsset('./rocketsheet.png');
     this.elapsedTime = 0;
     this.trueTime = 0;
-    this.frameDuration = 0.05;
+    this.frameDuration = 0.06;
     this.totalTime = 9 * this.frameDuration;
     this.width = 271;
     this.height = 624;
