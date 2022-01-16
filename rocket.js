@@ -8,7 +8,7 @@ let count = 0; class Rocket { constructor(ctx) { this.ctx = ctx;
     this.height = 912;
     this.xStart = 0;
     this.yStart = 0;
-    this.scale = .5;
+    this.scale = .4;
     this.x = 500;
     this.y = 500;
     this.vx = 0;
@@ -42,16 +42,16 @@ update() {
         if(this.theta < Math.PI / 2) diff = -2*Math.PI + (newTheta-this.theta);
         else diff = newTheta-this.theta;
       }
-      this.vx += (newX - this.x)^3  / 1e10 * Math.sign(newX - this.x);
+      this.vx += (newX - this.x)^2  / 1e2 * Math.sign(newX - this.x);
        // this.vx += (newX - this.x) / 30;
-      this.vx *= 0.83;
-      this.vy += (newY - this.y)^3 / 1e10 * Math.sign (newY - this.y);
+      this.vx *= 0.89;
+      this.vy += (newY - this.y)^2 / 1e2 * Math.sign (newY - this.y);
       // this.vy += (newY - this.y) / 30;
-      this.vy *= 0.83;
+      this.vy *= 0.89;
       // this.theta += this.vTheta*gameEngine.clockTick * .01;
       this.theta  = (this.theta + diff*.1+2*Math.PI) % (2 * Math.PI);
-      this.x = (this.x + this.vx * gameEngine.clockTick) % this.ctx.canvas.width;
-      this.y  = (this.y + this.vy * gameEngine.clockTick) % this.ctx.canvas.height;
+      this.x = (this.x + this.vx * gameEngine.clockTick+this.ctx.canvas.width) % this.ctx.canvas.width;
+      this.y  = (this.y + this.vy * gameEngine.clockTick+this.ctx.canvas.height) % this.ctx.canvas.height;
     }
     // this.x = 100*Math.cos(this.trueTime*2)+100;
     // this.y = 100*Math.sin(this.trueTime*2)+100;
