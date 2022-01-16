@@ -4,7 +4,7 @@ class Rocket {
     this.spriteSheet = ASSET_MANAGER.getAsset('./rocketsheet.png');
     this.elapsedTime = 0;
     this.trueTime = 0;
-    this.frameDuration = 0.06;
+    this.frameDuration = .08;
     this.totalTime = 9 * this.frameDuration;
     this.width = 271;
     this.height = 624;
@@ -23,7 +23,7 @@ class Rocket {
     this.elapsedTime+=gameEngine.clockTick;
     this.trueTime+= gameEngine.clockTick;
     if(this.elapsedTime >= this.totalTime) this.elapsedTime -= this.totalTime;
-    let frame = Math.floor(this.elapsedTime / 0.2)
+    let frame = Math.floor(this.elapsedTime / this.frameDuration)
     this.ctx.drawImage(this.spriteSheet,
       this.xStart + frame * this.width, this.yStart,
       this.width, this.height,
