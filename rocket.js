@@ -45,10 +45,10 @@ update() {
       }
       this.vx += (newX - this.x)^2  / 1e2 * Math.sign(newX - this.x);
        // this.vx += (newX - this.x) / 30;
-      this.vx *= 0.95;
+      this.vx *= 0.87;
       this.vy += (newY - this.y)^2 / 1e2 * Math.sign (newY - this.y);
       // this.vy += (newY - this.y) / 30;
-      this.vy *= 0.95;
+      this.vy *= 0.87;
       // this.theta += this.vTheta*gameEngine.clockTick * .01;
     this.yscale = this.scale * (1 + Math.sqrt(this.vx * this.vx + this.vy * this.vy) / 10000);
       this.theta  = (this.theta + diff*.1+2*Math.PI) % (2 * Math.PI);
