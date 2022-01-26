@@ -7,14 +7,14 @@ let count = 0; class Rocket { constructor(ctx) { this.ctx = ctx;
     this.width = 271;
     this.realHeight = 912
     //this.truncY = 300
-  this.flame = 0;
+    this.flame = 100
     this.height = this.realHeight; //-this.truncY;
     this.xStart = 0;
     this.yStart = 0;
     this.scale = .4;
     this.yscale = this.scale;
     this.x = 500;
-    this.y = 500;
+    this.y = 200;
     this.vx = 0;
     this.vy = 0;
     this.vTheta = 100;
@@ -57,7 +57,7 @@ update() {
       const  speed = this.vx * this.vx + this.vy * this.vy
     this.yscale = this.scale * (1 + speed / 250000000);
       //this.height = this.realHeight - this.truncY * (1 - speed / 3000000)
-      this.flame = speed / 10000
+      this.flame = speed / 10000 + 70
       this.theta  = (this.theta + diff*.1+2*Math.PI) % (2 * Math.PI);
       this.x = (this.x + this.vx * gameEngine.clockTick+this.ctx.canvas.width) % this.ctx.canvas.width;
       this.y  = (this.y + this.vy * gameEngine.clockTick+this.ctx.canvas.height) % this.ctx.canvas.height;
@@ -86,8 +86,15 @@ update() {
     let y = h*0.6;
 
     c.moveTo(x1,y);
-    c.moveTo((x1+x2)/2, y+this.flame)
-    c.lineTo(x2,y);
+    // c.moveTo((x1+x2)/2, y+this.flame)
+    let t = this.flame*0.08;
+    c.bezierCurveTo(x1-this.flame*0.1, y+this.flame*0.7, (x1+x2)/2-this.flame/t*2, y+this.flame*0.9,
+      (x1+x2)/2-this.flame/t, y+this.flame);
+    c.bezierCurveTo((x1+x2)/2, y+this.flame*1.03, (x1+x2)/2, y+this.flame*1.03,
+      (x1+x2)/2+this.flame/t, y+this.flame);
+    c.bezierCurveTo((x1+x2)/2+this.flame/t*2, y+this.flame*0.9, x2+this.flame*0.1, y+this.flame*0.7,
+      x2, y)
+    // c.lineTo(x2,y);
 
     c.lineTo(w*0.85, h*0.6)
     c.lineTo(w, h)
@@ -105,10 +112,6 @@ update() {
       this.width, this.height,
       0, 0,
       this.width, this.height)
-
-
-
-
 
     let offScreenCanvas = document.createElement('canvas');
     offScreenCanvas.width = this.height * this.yscale*2;
