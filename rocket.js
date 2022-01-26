@@ -54,7 +54,7 @@ update() {
       // this.vy += (newY - this.y) / 30;
       this.vy *= 0.90;
       // this.theta += this.vTheta*gameEngine.clockTick * .01;
-      const  speed = this.vx * this.vx + this.vy * this.vy
+      const  speed = (this.vx * this.vx + this.vy * this.vy)*1.5
     this.yscale = this.scale * (1 + speed / 250000000);
       //this.height = this.realHeight - this.truncY * (1 - speed / 3000000)
       this.flame = speed / 10000 + 70
