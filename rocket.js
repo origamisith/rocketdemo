@@ -5,10 +5,12 @@ let count = 0; class Rocket { constructor(ctx) { this.ctx = ctx;
     this.frameDuration = .08;
     this.totalTime = 9 * this.frameDuration;
     this.width = 271;
-    this.height = 912;
+    this.realHeight = 912
+    this.truncY = 300
+    this.height = this.realHeight-this.truncY;
     this.xStart = 0;
     this.yStart = 0;
-    this.scale = .5;
+    this.scale = .4;
     this.yscale = this.scale;
     this.x = 500;
     this.y = 500;
@@ -19,6 +21,7 @@ let count = 0; class Rocket { constructor(ctx) { this.ctx = ctx;
   }
 update() {
    // this.theta += this.vTheta*gameEngine.clockTick * .01;
+  //this.height = this.realHeight - this.truncY * 0;
   if (gameEngine.mouse) {
       const {x: newX, y: newY} = gameEngine.mouse;
       let dx = newX - this.x;
@@ -45,12 +48,14 @@ update() {
       }
       this.vx += (newX - this.x)^2  / 1e2 * Math.sign(newX - this.x);
        // this.vx += (newX - this.x) / 30;
-      this.vx *= 0.87;
+      this.vx *= 0.90;
       this.vy += (newY - this.y)^2 / 1e2 * Math.sign (newY - this.y);
       // this.vy += (newY - this.y) / 30;
-      this.vy *= 0.87;
+      this.vy *= 0.90;
       // this.theta += this.vTheta*gameEngine.clockTick * .01;
-    this.yscale = this.scale * (1 + Math.sqrt(this.vx * this.vx + this.vy * this.vy) / 10000);
+      const  speed = this.vx * this.vx + this.vy * this.vy
+    this.yscale = this.scale * (1 + speed / 250000000);
+      this.height = this.realHeight - this.truncY * (1 - speed / 3000000)
       this.theta  = (this.theta + diff*.1+2*Math.PI) % (2 * Math.PI);
       this.x = (this.x + this.vx * gameEngine.clockTick+this.ctx.canvas.width) % this.ctx.canvas.width;
       this.y  = (this.y + this.vy * gameEngine.clockTick+this.ctx.canvas.height) % this.ctx.canvas.height;
