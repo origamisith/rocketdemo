@@ -1,7 +1,10 @@
 class Rocket {
   constructor(ctx) {
     this.ctx = ctx;
+    this.removeFromWorld = false;
     this.spriteSheet = ASSET_MANAGER.getAsset('./rocketsheettall.png');
+    this.explodesheet = ASSET_MANAGER.getAsset("./explosion.png")
+    this.explodeFrame = 0;
     this.elapsedTime = 0;
     this.frameDuration = .08;
     this.totalTime = 9 * this.frameDuration;
@@ -19,58 +22,95 @@ class Rocket {
     this.vy = 0;
     // this.vTheta = 100; // For when I'm testing and want the ship to spin at constant rate
     this.theta = Math.PI/2;
+    this.vTheta = 0;
+    this.mass = 1e5;
   }
-update() {
-   // this.theta += this.vTheta*gameEngine.clockTick * .01; //These lines are just used for testing when I comment out the if statement
-  if (gameEngine.mouse) {
-      const {x: newX, y: newY} = gameEngine.mouse;
-      //X and Y differences between current position and mouse position
-      let dx = newX - this.x;
-      let dy = newY - this.y;
+  handleCollisions() {
+    let that = this;
+    gameEngine.entities.forEach(entity => {
+      if(entity instanceof Planet) {
+        let {x: ex, y: ey} = entity;
+        let {x, y} = this;
+        let dx = ex-x;
+        let dy = ey-y;
+        let dist = Math.sqrt(dx*dx+dy*dy);
+        let nx = dx/dist;
+        let ny = dy/dist;
+        let force = that.mass * entity.mass * 9.8 *6.7e-11/ (Math.pow(dist, 3))
+        this.vx += force*nx;
+        this.vy += force*ny;
+        if (dist < entity.size/2) {
+          that.explode = true;
+          gameEngine.click = false;
+          that.update = () => {
+            if(gameEngine.click) {
+              loadLevel(that.ctx);
+            }
+          };
+        }
+      }
+    })
+  }
+  update() {
+    // this.theta += this.vTheta*gameEngine.clockTick * .01; //These lines are just used for testing when I comment out the if statement
+    if (gameEngine.mouse) {
+      if(gameEngine.mouseDown) {
+        const {x: newX, y: newY} = gameEngine.mouse;
+        //X and Y differences between current position and mouse position
+        let dx = newX - this.x;
+        let dy = newY - this.y;
 
-      /* Angle section: kind of a mess but it works, much more work than distance change
-       * Annoying bit is that arctangent only returns a relative angle that's correct in 2/4 quadrants
-       * For this demo, I transform the canvas to the layout of a normal unit circle so I can visualize it better
-       *    To correct for upside-downness I take the negative of the arctangent, and when I call ctx.rotate I use an offset of PI/2
-       * Then, I handle each quadrant separately because until I did this, the ship's angle would cross 2PI, and instead of
-       *    taking the short way to 2PI + .01, it would spin all the way back around to .01
-       */
-      let newTheta = -Math.atan((newY - this.y) / (newX - this.x))
-      let diff;
-      if (dx >= 0 && dy < 0) { // Quadrant 1
-        //If mouse is in Q1 but ship is in Q4, prevent spinning a large negative angle by adding 2PI
-        if(this.theta > 3*Math.PI / 2) diff = 2*Math.PI + (newTheta-this.theta);
-         else diff = newTheta-this.theta
-      }
-      //These two quadrants have no problem
-      else if (dx < 0 && dy < 0) { //Quadrant 2
-        newTheta += Math.PI;
-        diff = newTheta-this.theta
-      }
-      else if (dx < 0 && dy >= 0) { //Quadrant 3
-        newTheta += Math.PI;
-        diff = newTheta-this.theta
-      }
-      else if(dx >= 0 && dy >= 0) {
-        newTheta = 2* Math.PI + newTheta;
-        //If mouse is in Q4 but ship is in Q1, prevent spinning large positive angle by subtracting 2PI
-        if(this.theta < Math.PI / 2) diff = -2*Math.PI + (newTheta-this.theta);
-        else diff = newTheta-this.theta;
-      }
-      // The method of using (x+a)%a is well-known to be able to handle negative values
-      // The .1 is to regulate how much the difference affects the angle, so it doesn't spin instantly, but has some weight
-      this.theta  = (this.theta + diff*.1+2*Math.PI) % (2 * Math.PI);
+        /* Angle section: kind of a mess but it works, much more work than distance change
+         * Annoying bit is that arctangent only returns a relative angle that's correct in 2/4 quadrants
+         * For this demo, I transform the canvas to the layout of a normal unit circle so I can visualize it better
+         *    To correct for upside-downness I take the negative of the arctangent, and when I call ctx.rotate I use an offset of PI/2
+         * Then, I handle each quadrant separately because until I did this, the ship's angle would cross 2PI, and instead of
+         *    taking the short way to 2PI + .01, it would spin all the way back around to .01
+         */
+        let newTheta = -Math.atan((newY - this.y) / (newX - this.x))
+        let diff;
+        if (dx >= 0 && dy < 0) { // Quadrant 1
+          //If mouse is in Q1 but ship is in Q4, prevent spinning a large negative angle by adding 2PI
+          if(this.theta > 3*Math.PI / 2) diff = 2*Math.PI + (newTheta-this.theta);
+          else diff = newTheta-this.theta
+        }
+        //These two quadrants have no problem
+        else if (dx < 0 && dy < 0) { //Quadrant 2
+          newTheta += Math.PI;
+          diff = newTheta-this.theta
+        }
+        else if (dx < 0 && dy >= 0) { //Quadrant 3
+          newTheta += Math.PI;
+          diff = newTheta-this.theta
+        }
+        else if(dx >= 0 && dy >= 0) {
+          newTheta = 2* Math.PI + newTheta;
+          //If mouse is in Q4 but ship is in Q1, prevent spinning large positive angle by subtracting 2PI
+          if(this.theta < Math.PI / 2) diff = -2*Math.PI + (newTheta-this.theta);
+          else diff = newTheta-this.theta;
+        }
+        // The method of using (x+a)%a is well-known to be able to handle negative values
+        // The .1 is to regulate how much the difference affects the angle, so it doesn't spin instantly, but has some weight
+        // console.log(diff)
+        this.vTheta += diff*1e-5* Math.sqrt(this.vx*this.vx+this.vy*this.vy)
 
-      //Distance section
-      // I decided to make change in velocity proportional to the change in distance
-      this.vx += dx^2  / 1e2;
-      this.vx *= 0.90; //Friction, make the constant smaller to increase friction and slow the ship
-      this.vy += dy^2 / 1e2;
-      this.vy *= 0.90;
+        //Distance section
+        // I decided to make change in velocity proportional to the change in distance
+        const baseX = Math.sign(dx)*2
+        const baseY = Math.sign(dy)*2
+        this.vx += (dx/20)+baseX;
+        this.vx *= 0.90; //Friction, make the constant smaller to increase friction and slow the ship
+        this.vy += (dy/20)+baseY;
+        this.vy *= 0.90;
+      }
 
+      this.handleCollisions()
       //Use velocity, let ship wrap around the canvas with modulo using same (x+a)%a trick as before
       this.x = (this.x + this.vx * gameEngine.clockTick+this.ctx.canvas.width) % this.ctx.canvas.width;
       this.y  = (this.y + this.vy * gameEngine.clockTick+this.ctx.canvas.height) % this.ctx.canvas.height;
+      if(gameEngine.mouseDown) this.vTheta *= .8
+      else this.vTheta *= .99
+      this.theta  = (this.theta + this.vTheta+2*Math.PI) % (2 * Math.PI);
 
       // Flame size is proportional to the squared magnitude speed, so I calculate that first.
       const  speed = (this.vx * this.vx + this.vy * this.vy)
@@ -83,6 +123,14 @@ update() {
 
   //Advance spritesheet, shape flame, rotate and stretch ship
   draw() {
+    if(this.explode) {
+      this.ctx.drawImage(
+        this.explodesheet, Math.floor(this.explodeFrame/5)*600, 0, 600, 600,
+        this.x - this.width / 2, this.y - this.width / 2, this.width, this.width
+      )
+      if(this.explodeFrame < 15) this.explodeFrame++;
+      return;
+    }
     //Choose frame
     this.elapsedTime+=gameEngine.clockTick;
     if(this.elapsedTime >= this.totalTime) this.elapsedTime -= this.totalTime;
@@ -97,9 +145,9 @@ update() {
     c.imageSmoothingEnabled = false;
 
     //Begin clipping portion to shape rocket flame
-      // Idea is that flame size changes according to speed, but a flat line would look bad, and making a bunch of
-       //different-size flame sprites is a lot of work. I could also use an image to mask, but I decided to use a path
-     //
+    // Idea is that flame size changes according to speed, but a flat line would look bad, and making a bunch of
+    //different-size flame sprites is a lot of work. I could also use an image to mask, but I decided to use a path
+    //
     c.beginPath();
     let w = clipCanvas.width;
     let h = clipCanvas.height;
@@ -109,7 +157,6 @@ update() {
     let y = h*0.6; //vertical position of nozzle
 
     c.moveTo(x1,y);
-    let t = this.flame*0.08;
     //Draw from left side of nozzle to almost the apex of the flame
     c.bezierCurveTo(x1-this.flame*0.1, y+this.flame*0.7, (x1+x2)/2-30, y+this.flame*0.9,
       (x1+x2)/2-12, y+this.flame);
