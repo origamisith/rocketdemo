@@ -53,12 +53,15 @@ class Rocket {
   }
   update() {
     // this.theta += this.vTheta*gameEngine.clockTick * .01; //These lines are just used for testing when I comment out the if statement
+    let speed = 0
     if (gameEngine.mouse) {
       if(gameEngine.mouseDown) {
         const {x: newX, y: newY} = gameEngine.mouse;
         //X and Y differences between current position and mouse position
         let dx = newX - this.x;
         let dy = newY - this.y;
+        // Flame size is proportional to the squared magnitude speed, so I calculate that first.
+        speed = (dx*dx+dy*dy)
 
         /* Angle section: kind of a mess but it works, much more work than distance change
          * Annoying bit is that arctangent only returns a relative angle that's correct in 2/4 quadrants
@@ -103,6 +106,7 @@ class Rocket {
         this.vy += (dy/20)+baseY;
         this.vy *= 0.90;
       }
+      this.flame = speed / 3000 + 70 //This constant used in draw method, 70 is minimum flame size
 
       this.handleCollisions()
       //Use velocity, let ship wrap around the canvas with modulo using same (x+a)%a trick as before
@@ -112,12 +116,9 @@ class Rocket {
       else this.vTheta *= .99
       this.theta  = (this.theta + this.vTheta+2*Math.PI) % (2 * Math.PI);
 
-      // Flame size is proportional to the squared magnitude speed, so I calculate that first.
-      const  speed = (this.vx * this.vx + this.vy * this.vy)
-      this.flame = speed / 10000 + 70 //This constant used in draw method, 70 is minimum flame size
 
       // Stretch ship according to squared speed, this constant used in draw method
-      this.yscale = this.scale * (1 + speed / 160000000);
+      this.yscale = this.scale * (1 + speed / 16000000);
     }
   }
 

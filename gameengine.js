@@ -55,6 +55,10 @@ class GameEngine {
         this.ctx.canvas.addEventListener("click", e => {
             this.click = true;
         })
+
+        this.ctx.canvas.addEventListener("mouseout", e => {
+            this.mouseDown = false;
+        })
         this.ctx.canvas.addEventListener("mousemove", e => {
             if (this.options.debugging) {
                 console.log("MOUSE_MOVE", getXandY(e));
