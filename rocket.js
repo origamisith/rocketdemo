@@ -4,6 +4,8 @@ class Rocket {
     this.removeFromWorld = false;
     this.spriteSheet = ASSET_MANAGER.getAsset('./rocketsheettall.png');
     this.explodesheet = ASSET_MANAGER.getAsset("./explosion.png")
+    this.winSheet = ASSET_MANAGER.getAsset("./win.png")
+    this.win = false;
     this.explodeFrame = 0;
     this.elapsedTime = 0;
     this.frameDuration = .08;
@@ -26,6 +28,7 @@ class Rocket {
     this.mass = 1e5;
   }
   handleCollisions() {
+    console.log(this.x + ", " + this.y);
     let that = this;
     gameEngine.entities.forEach(entity => {
       if(entity instanceof Planet) {
@@ -40,11 +43,16 @@ class Rocket {
         this.vx += force*nx;
         this.vy += force*ny;
         if (dist < entity.size/2) {
-          that.explode = true;
+          if(entity.type === 3) {
+            that.win = true;
+          }
+          else that.explode = true;
           gameEngine.click = false;
           that.update = () => {
             if(gameEngine.click) {
-              loadLevel(that.ctx);
+              // loadLevel(that.ctx);
+              location.reload();
+              this.update = () => {}
             }
           };
         }
@@ -58,8 +66,10 @@ class Rocket {
       if(gameEngine.mouseDown) {
         const {x: newX, y: newY} = gameEngine.mouse;
         //X and Y differences between current position and mouse position
-        let dx = newX - this.x;
-        let dy = newY - this.y;
+        // let dx = newX - this.x;
+        // let dy = newY - this.y;
+        let dx = newX - this.ctx.canvas.width/2;
+        let dy = newY - this.ctx.canvas.height/2;
         // Flame size is proportional to the squared magnitude speed, so I calculate that first.
         speed = (dx*dx+dy*dy)
 
@@ -70,7 +80,7 @@ class Rocket {
          * Then, I handle each quadrant separately because until I did this, the ship's angle would cross 2PI, and instead of
          *    taking the short way to 2PI + .01, it would spin all the way back around to .01
          */
-        let newTheta = -Math.atan((newY - this.y) / (newX - this.x))
+        let newTheta = -Math.atan(dy / dx)
         let diff;
         if (dx >= 0 && dy < 0) { // Quadrant 1
           //If mouse is in Q1 but ship is in Q4, prevent spinning a large negative angle by adding 2PI
@@ -102,16 +112,15 @@ class Rocket {
         const baseX = Math.sign(dx)*2
         const baseY = Math.sign(dy)*2
         this.vx += (dx/20)+baseX;
-        this.vx *= 0.90; //Friction, make the constant smaller to increase friction and slow the ship
+        this.vx *= 0.97; //Friction, make the constant smaller to increase friction and slow the ship
         this.vy += (dy/20)+baseY;
-        this.vy *= 0.90;
+        this.vy *= 0.97;
       }
       this.flame = speed / 3000 + 70 //This constant used in draw method, 70 is minimum flame size
 
       this.handleCollisions()
-      //Use velocity, let ship wrap around the canvas with modulo using same (x+a)%a trick as before
-      this.x = (this.x + this.vx * gameEngine.clockTick+this.ctx.canvas.width) % this.ctx.canvas.width;
-      this.y  = (this.y + this.vy * gameEngine.clockTick+this.ctx.canvas.height) % this.ctx.canvas.height;
+      this.x = this.x + this.vx * gameEngine.clockTick;
+      this.y  = this.y + this.vy * gameEngine.clockTick;
       if(gameEngine.mouseDown) this.vTheta *= .8
       else this.vTheta *= .99
       this.theta  = (this.theta + this.vTheta+2*Math.PI) % (2 * Math.PI);
@@ -127,9 +136,15 @@ class Rocket {
     if(this.explode) {
       this.ctx.drawImage(
         this.explodesheet, Math.floor(this.explodeFrame/5)*600, 0, 600, 600,
-        this.x - this.width / 2, this.y - this.width / 2, this.width, this.width
+        this.x - this.width / 2 - gameEngine.camera.x, this.y - this.width / 2 - gameEngine.camera.y, this.width, this.width
       )
       if(this.explodeFrame < 15) this.explodeFrame++;
+      return;
+    }
+    if(this.win) {
+      this.ctx.drawImage(
+        this.winSheet, 0, 0, 800, 200, this.ctx.canvas.width/2-400, this.ctx.canvas.height/2-200, 800, 200
+      )
       return;
     }
     //Choose frame
@@ -226,10 +241,13 @@ class Rocket {
     //because the offscreen canvas size is half.
     //The other reason my offsets are more complicated is that the x-scaling factor and the y-scaling factor are independent.
     this.ctx.drawImage(offScreenCanvas,
-      this.x - (this.height*2*this.yscale-this.width*this.scale)/2-this.width/2*this.scale, //scale the offset
-      this.y - this.height*this.yscale, // scale the offset
+      this.x-(this.height*2*this.yscale-this.width*this.scale)/2-this.width/2*this.scale - gameEngine.camera.x, //scale the offset
+      this.y - this.height*this.yscale - gameEngine.camera.y, // scale the offset
       this.height*this.yscale*2, this.height*2*this.yscale) // scale
     c.restore()
+    this.ctx.strokeStyle='#FFFFFF'
+    this.ctx.fillRect(this.x-10, this.y-10, 20, 200)
+
   }
 
   // //rotate about center

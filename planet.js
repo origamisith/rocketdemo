@@ -6,16 +6,16 @@ class Planet {
     this.type = type; //0, 1, or 2
     this.pixelSize = 600;
     this.size = size;
-    this.mass = Math.pow(size, 3)*3e5
+    this.mass = Math.pow(size, 3)*6e5
     this.x = x;
     this.y = y;
   }
   draw() {
+    let {x, y} = gameEngine.camera;
     this.ctx.drawImage(
       this.spritesheet, this.type * this.pixelSize, 0, this.pixelSize, this.pixelSize,
-      this.x - this.size / 2, this.y - this.size / 2, this.size, this.size
+      this.x - this.size / 2 - x, this.y - this.size / 2-y, this.size, this.size
     )
-
   }
   update() {
   }

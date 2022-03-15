@@ -5,6 +5,7 @@ class GameEngine {
         // What you will use to draw
         // Documentation: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
         this.ctx = null;
+        this.camera = {x:0, y:0}
 
         // Everything that will be updated and drawn each frame
         this.entities = [];
@@ -33,6 +34,7 @@ class GameEngine {
         this.ctx = ctx;
         this.startInput();
         this.timer = new Timer();
+        this.stars = ASSET_MANAGER.getAsset('./stars.png')
     };
 
     start() {
@@ -113,7 +115,20 @@ class GameEngine {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
+        this.camera.x = this.rocket.x - this.ctx.canvas.width/2
+        this.camera.y = this.rocket.y - this.ctx.canvas.height/2
+        // console.log(this.camera)
         // Draw latest things first
+
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000-this.camera.x*.1, this.ctx.canvas.height/2-1000 - this.camera.y*.1, 2000, 2000)
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000-2000 - this.camera.x*.1, this.ctx.canvas.height/2-1000-2000 - this.camera.y*.1, 2000, 2000)
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000-this.camera.x*.1, this.ctx.canvas.height/2-1000-2000 - this.camera.y*.1, 2000, 2000)
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000+2000 - this.camera.x*.1, this.ctx.canvas.height/2-1000-2000 - this.camera.y*.1, 2000, 2000)
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000-2000 - this.camera.x*.1, this.ctx.canvas.height/2-1000+2000 - this.camera.y*.1, 2000, 2000)
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000+2000 - this.camera.x*.1, this.ctx.canvas.height/2-1000 - this.camera.y*.1, 2000, 2000)
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000+2000 - this.camera.x*.1, this.ctx.canvas.height/2-1000+2000 - this.camera.y*.1, 2000, 2000)
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000-this.camera.x*.1, this.ctx.canvas.height/2-1000+2000 - this.camera.y*.1, 2000, 2000)
+        this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, this.ctx.canvas.width/2-1000-2000-this.camera.x*.1, this.ctx.canvas.height/2-1000 - this.camera.y*.1, 2000, 2000)
         for (let i = this.entities.length - 1; i >= 0; i--) {
             this.entities[i].draw(this.ctx, this);
         }
@@ -121,6 +136,7 @@ class GameEngine {
 
     update() {
         let entitiesCount = this.entities.length;
+
 
         for (let i = 0; i < entitiesCount; i++) {
             let entity = this.entities[i];
