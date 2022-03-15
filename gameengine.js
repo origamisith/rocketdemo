@@ -130,11 +130,13 @@ class GameEngine {
         this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, w/2-1000+2000 - this.camera.x*.1, h/2-1000+2000 - this.camera.y*.1, 2000, 2000)
         this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, w/2-1000-this.camera.x*.1, h/2-1000+2000 - this.camera.y*.1, 2000, 2000)
         this.ctx.drawImage(this.stars, 0, 0, 2000, 2000, w/2-1000-2000-this.camera.x*.1, h/2-1000 - this.camera.y*.1, 2000, 2000)
+
+        this.ctx.strokeStyle = 'Red'
+        this.ctx.strokeRect(w*-4.5-this.camera.x, h*-4.5-this.camera.y, w*9, h*9);
+
         for (let i = this.entities.length - 1; i >= 0; i--) {
             this.entities[i].draw(this.ctx, this);
         }
-        this.ctx.strokeStyle = 'Red'
-        this.ctx.strokeRect(w*-5-this.camera.x, h*-5-this.camera.y, w*10, h*10);
     };
 
     update() {

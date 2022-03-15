@@ -28,8 +28,8 @@ function loadLevel(ctx) {
 	for(let i = 0; i < 50; i++) {
 		let x, y;
 		do {
-			x = Math.random() * width * 6 - width * 3;
-			y = Math.random() * height * 6 - height * 3;
+			x = Math.random() * width * 9 - width * 4.5;
+			y = Math.random() * height * 9 - height * 4.5;
 		} while(!checkDist({x:x, y:y}, positions))
 		positions.push({x:x, y:y})
 		if(i < 3) {
