@@ -1,3 +1,11 @@
+let c = document.createElement("canvas");
+c.width = window.innerWidth;
+c.height = window.innerHeight;
+c.id = "gameWorld";
+c.style.background = "black"
+document.getElementById("game").appendChild(c);
+
+
 const ASSET_MANAGER = new AssetManager();
 ASSET_MANAGER.queueDownload('./rocketsheettall.png')
 ASSET_MANAGER.queueDownload('./planets.png')
@@ -25,18 +33,19 @@ function loadLevel(ctx) {
 	let {width, height} = gameEngine.ctx.canvas;
 	//
 	let positions = [];
-	for(let i = 0; i < 50; i++) {
+	const howMany = 50 * (width / 1920) * (width / 1920);
+	for(let i = 0; i < howMany; i++) {
 		let x, y;
 		do {
 			x = Math.random() * width * 9 - width * 4.5;
 			y = Math.random() * height * 9 - height * 4.5;
 		} while(!checkDist({x:x, y:y}, positions))
 		positions.push({x:x, y:y})
-		if(i < 3) {
+		if(i < howMany * 0.06) {
 			gameEngine.addEntity(new Planet(ctx, 3, 300, x, y))
 			continue;
 		}
-		const size = Math.random() * 500+50;
+		const size = Math.random() * 350+50;
 		const type = Math.floor(Math.random() * 3);
 		gameEngine.addEntity(new Planet(ctx, type, size, x, y))
 	}

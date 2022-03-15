@@ -16,7 +16,7 @@ class Rocket {
     this.height = 912;
     this.xStart = 0;
     this.yStart = 0;
-    this.scale = .4;
+    this.scale = .3;
     this.yscale = this.scale; //My rocket can stretch according to velocity, so the y-axis scales differently
     this.x = 500;
     this.y = 200;
