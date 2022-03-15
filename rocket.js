@@ -28,7 +28,6 @@ class Rocket {
     this.mass = 1e5;
   }
   handleCollisions() {
-    console.log(this.x + ", " + this.y);
     let that = this;
     gameEngine.entities.forEach(entity => {
       if(entity instanceof Planet) {

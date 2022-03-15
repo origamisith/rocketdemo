@@ -6,7 +6,7 @@ class Planet {
     this.type = type; //0, 1, or 2
     this.pixelSize = 600;
     this.size = size;
-    this.mass = Math.pow(size, 3)*6e5
+    this.mass = Math.pow(size, 3)*45e4
     this.x = x;
     this.y = y;
   }

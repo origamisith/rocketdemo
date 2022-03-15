@@ -24,18 +24,34 @@ function loadLevel(ctx) {
 	gameEngine.addEntity(rocket);
 	let {width, height} = gameEngine.ctx.canvas;
 	//
+	let positions = [];
 	for(let i = 0; i < 50; i++) {
-		const x = Math.random() * width*6 - width*3;
-		const y = Math.random() * height*6 -height*3;
-		const size = Math.random() * 500+50;
-		const type = Math.floor(Math.random() * 3);
+		let x, y;
+		do {
+			x = Math.random() * width * 6 - width * 3;
+			y = Math.random() * height * 6 - height * 3;
+		} while(!checkDist({x:x, y:y}, positions))
+		positions.push({x:x, y:y})
 		if(i < 3) {
 			gameEngine.addEntity(new Planet(ctx, 3, 300, x, y))
 			continue;
 		}
+		const size = Math.random() * 500+50;
+		const type = Math.floor(Math.random() * 3);
 		gameEngine.addEntity(new Planet(ctx, type, size, x, y))
 	}
 
 	gameEngine.start();
 	console.log(gameEngine.entities.length)
+}
+
+function checkDist(curr, list) {
+	if(((curr.x - 500)*(curr.x-500)+(curr.y-200)*(curr.y-200)) < 1000*1000) return false;
+	let result = true;
+	list.forEach(pos => {
+		if(((curr.x - pos.x)*(curr.x-pos.x) + (curr.y-pos.y)*(curr.y-pos.y)) < 600*600) {
+			result = false;
+		}
+	})
+	return result;
 }
