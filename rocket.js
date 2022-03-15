@@ -245,9 +245,6 @@ class Rocket {
       this.y - this.height*this.yscale - gameEngine.camera.y, // scale the offset
       this.height*this.yscale*2, this.height*2*this.yscale) // scale
     c.restore()
-    this.ctx.strokeStyle='#FFFFFF'
-    this.ctx.fillRect(this.x-10, this.y-10, 20, 200)
-
   }
 
   // //rotate about center
