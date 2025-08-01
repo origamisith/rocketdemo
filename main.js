@@ -26,7 +26,7 @@ ASSET_MANAGER.downloadAll(() => {
 
 function loadLevel(ctx) {
 	gameEngine.entities.forEach(e => e.removeFromWorld = true)
-	rocket = new Rocket(ctx);
+	this.rocket = new Rocket(ctx);
 
 	gameEngine.rocket = rocket;
 	gameEngine.addEntity(rocket);
